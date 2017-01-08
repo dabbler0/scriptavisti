@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <style>
+      #minimap-wrapper {
+        height: 200px;
+        width: 200px;
+        position: absolute;
+        top: 0; right: 0;
+        padding: 0px;
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      #viewport {
+        background-color: #000;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+      }
+      .hero-face {
+        display: inline-block;
+        margin: 0;
+        width: 50px;
+        height: 60px;
+        cursor: pointer;
+        position: relative;
+      }
+      .hero-health {
+        background-color: #0F0;
+        position: absolute;
+        top: 50; right: 0; left: 0; bottom: 0;
+      }
+      .hero-face:hover, .hero-face-selected {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      .hero-face img {
+        width: 50px;
+        height: 50px;
+      }
+      #heroes {
+        width: 270px;
+        height: 65px;
+        background-color: rgba(255, 255, 255, 0.3);
+        position: absolute;
+        top: 0; left: 0;
+      }
+      body, html {
+        padding: 0px;
+        margin: 0px;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      #game-elements {
+        display: none;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+      }
+      #menu-elements {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #000;
+      }
+      #edit-elements {
+        display: none;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #000;
+      }
+      #wrapper {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      #editor-wrapper {
+        background-color: rgba(255, 255, 255, 0.5);
+        position: absolute;
+        top: 60px;
+        bottom: 30px;
+        left: 0; right: 0;
+      }
+      #editor {
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: 10px; right: 10px;
+      }
+      #editor-footer {
+        position: absolute;
+        bottom: 0px; left: 0; right: 0;
+        height: 30px;
+      }
+      #menu {
+        position: absolute;
+        width: 200px;
+        height: 300px;
+        margin-left: -100px;
+        margin-top: -150px;
+        left: 50%;
+        top: 50%;
+        font-family: monospace;
+        font-size: 20px;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      #menu-header {
+        text-align: center;
+        margin: 5px;
+        padding: 5px;
+        color: #000;
+        background-color: #FFF;
+      }
+      .menu-item {
+        color: #FFF;
+        text-align: center;
+        margin: 5px;
+        padding: 5px;
+        background-color: #222;
+        cursor: pointer;
+      }
+      .menu-item:hover {
+        background-color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="menu-elements">
+      <div id="menu">
+        <div id="menu-header">
+          //scriptus
+        </div>
+        <div id="play" class="menu-item">
+          Play
+        </div>
+        <div id="edit" class="menu-item">
+          Edit Scripts
+        </div>
+      </div>
+    </div>
+
+    <div id="edit-elements">
+      <div id="wrapper">
+        <div id="editor-header">
+          <div class="hero-face" id="exit">
+            <img src="assets/exit.png"/>
+          </div>
+          <div class="hero-face" id="knight-edit">
+            <img src="assets/knight-head.png"/>
+          </div>
+          <div class="hero-face" id="archer-edit">
+            <img src="assets/archer-head.png"/>
+          </div>
+          <div class="hero-face" id="rogue-edit">
+            <img src="assets/rogue-head.png"/>
+          </div>
+          <div class="hero-face" id="mage-edit">
+            <img src="assets/mage-head.png"/>
+          </div>
+        </div>
+        <div id="editor-wrapper">
+          <div id="editor"></div>
+        </div>
+        <div id="editor-footer">
+        </div>
+      </div>
+    </div>
+
+    <div id="game-elements">
+      <canvas id="viewport" tabIndex="0"></canvas>
+      <div id="heroes">
+        <div class="hero-face" id="knight-face">
+          <img src="assets/knight-head.png"/>
+          <div class="hero-health" id="knight-health"></div>
+        </div>
+        <div class="hero-face" id="archer-face">
+          <img src="assets/archer-head.png"/>
+          <div class="hero-health" id="archer-health"></div>
+        </div>
+        <div class="hero-face" id="rogue-face">
+          <img src="assets/rogue-head.png"/>
+          <div class="hero-health" id="rogue-health"></div>
+        </div>
+        <div class="hero-face" id="mage-face">
+          <img src="assets/mage-head.png"/>
+          <div class="hero-health" id="mage-health"></div>
+        </div>
+        <div class="hero-face" id="spectator-face">
+          <img src="assets/spectator.png"/>
+        </div>
+      </div>
+      <div id="minimap-wrapper">
+        <canvas id="minimap" width="200" height="200"></canvas>
+      </div>
+      <script>
+        var canvas = document.getElementById('viewport');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        window.onresize = function() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+      </script>
+    </div>
+    <script src="lib/ace/ace.js"></script>
+    <script src="build/index.js"></script>
+  </body>
+</html>

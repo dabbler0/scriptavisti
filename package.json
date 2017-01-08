@@ -1,0 +1,18 @@
+{
+  "name": "scriptus",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Anthony Bau <dab1998@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^3.6.4",
+    "gulp": "^3.9.1",
+    "gulp-coffeeify": "^0.1.8",
+    "gulp-connect": "^5.0.0",
+    "js-interpreter": "^1.1.0"
+  }
+}
