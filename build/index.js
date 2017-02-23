@@ -8141,7 +8141,11 @@ exports.PlayerCharacter = PlayerCharacter = (function(superClass) {
   PlayerCharacter.prototype.render = function(renderContext) {
     var camera, canvas, ctx;
     canvas = renderContext.canvas, ctx = renderContext.ctx, camera = renderContext.camera;
-    ctx.strokeStyle = '#F00';
+    if (this.allegiance === 'USER') {
+      ctx.strokeStyle = '#0F0';
+    } else {
+      ctx.strokeStyle = '#F00';
+    }
     ctx.strokeRect(this.pos.x - TILE_SIZE / 2 - camera.x + renderContext.halfPoint.x, this.pos.y - TILE_SIZE / 2 - camera.y + renderContext.halfPoint.y, TILE_SIZE, TILE_SIZE);
     return PlayerCharacter.__super__.render.apply(this, arguments);
   };
@@ -8168,9 +8172,34 @@ exports.PlayerCharacter = PlayerCharacter = (function(superClass) {
     return this.health -= x;
   };
 
-  PlayerCharacter.prototype.tick = function(state) {
-    var vector;
+  PlayerCharacter.prototype.tick = function(state, callback) {
+    var tidyUp, vector;
     this.lastKnownGameState = state;
+    tidyUp = (function(_this) {
+      return function() {
+        if (_this.moving) {
+          _this.velocity = _this.motionDirection.vector().times(_this.speed);
+        } else {
+          _this.velocity = new Vector(0, 0);
+        }
+        if (Math.abs(_this.attackDirection.angle) < Math.PI / 2) {
+          if (_this.active) {
+            _this.texture = _this.textures.activeRight;
+          } else {
+            _this.texture = _this.textures.passiveRight;
+          }
+        } else {
+          if (_this.active) {
+            _this.texture = _this.textures.activeLeft;
+          } else {
+            _this.texture = _this.textures.passiveLeft;
+          }
+        }
+        if (_this.health <= 0) {
+          return _this.downflag = true;
+        }
+      };
+    })(this);
     if (this.currentlyControlled) {
       vector = {
         x: 0,
@@ -8192,36 +8221,11 @@ exports.PlayerCharacter = PlayerCharacter = (function(superClass) {
       this.motionDirection = vector.direction();
       this.moving = vector.magnitude() !== 0;
       this.attackDirection = state.mousepos.minus(this.pos).direction();
+      tidyUp();
     } else if (state.time % 12 === 0) {
       this.interpreter.appendCode('update(); tick();');
-
-      /*
-      for [1...10000]
-        unless @interpreter.step()
-          break
-       */
       this.interpreter.run();
-    }
-    if (this.moving) {
-      this.velocity = this.motionDirection.vector().times(this.speed);
-    } else {
-      this.velocity = new Vector(0, 0);
-    }
-    if (Math.abs(this.attackDirection.angle) < Math.PI / 2) {
-      if (this.active) {
-        this.texture = this.textures.activeRight;
-      } else {
-        this.texture = this.textures.passiveRight;
-      }
-    } else {
-      if (this.active) {
-        this.texture = this.textures.activeLeft;
-      } else {
-        this.texture = this.textures.passiveLeft;
-      }
-    }
-    if (this.health <= 0) {
-      this.downflag = true;
+      tidyUp();
     }
     return PlayerCharacter.__super__.tick.apply(this, arguments);
   };

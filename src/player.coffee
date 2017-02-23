@@ -99,7 +99,10 @@ exports.PlayerCharacter = class PlayerCharacter extends Sprite
   render: (renderContext) ->
     {canvas, ctx, camera} = renderContext
 
-    ctx.strokeStyle = '#F00'
+    if @allegiance is 'USER'
+      ctx.strokeStyle = '#0F0'
+    else
+      ctx.strokeStyle = '#F00'
 
     ctx.strokeRect(
       @pos.x - TILE_SIZE / 2 - camera.x + renderContext.halfPoint.x,
@@ -136,8 +139,32 @@ exports.PlayerCharacter = class PlayerCharacter extends Sprite
   damage: (x) ->
     @health -= x
 
-  tick: (state) ->
+  tick: (state, callback) ->
     @lastKnownGameState = state
+
+    tidyUp = =>
+
+      # Move in the desired direction
+      if @moving
+        @velocity = @motionDirection.vector().times @speed
+      else
+        @velocity = new Vector 0, 0
+
+      # Adjust texture according to state
+      if Math.abs(@attackDirection.angle) < Math.PI / 2
+        if @active
+          @texture = @textures.activeRight
+        else
+          @texture = @textures.passiveRight
+      else
+        if @active
+          @texture = @textures.activeLeft
+        else
+          @texture = @textures.passiveLeft
+
+      if @health <= 0
+        @downflag = true
+
 
     # If we are currently controlled, respond to keypresses and mouse
     if @currentlyControlled
@@ -162,40 +189,16 @@ exports.PlayerCharacter = class PlayerCharacter extends Sprite
       # Face the mouse
       @attackDirection = state.mousepos.minus(@pos).direction()
 
+      do tidyUp
+
     # Otherwise, run our script code (We run script code exactly 5 times per second, for performance reasons)
     else if state.time % 12 is 0
       @interpreter.appendCode 'update(); tick();'
 
-      # Run up to 10,000 steps of JavaScript code.
-      ###
-      for [1...10000]
-        unless @interpreter.step()
-          break
-      ###
-
       # For now we'll just run all code
       @interpreter.run()
 
-    # Move in the desired direction
-    if @moving
-      @velocity = @motionDirection.vector().times @speed
-    else
-      @velocity = new Vector 0, 0
-
-    # Adjust texture according to state
-    if Math.abs(@attackDirection.angle) < Math.PI / 2
-      if @active
-        @texture = @textures.activeRight
-      else
-        @texture = @textures.passiveRight
-    else
-      if @active
-        @texture = @textures.activeLeft
-      else
-        @texture = @textures.passiveLeft
-
-    if @health <= 0
-      @downflag = true
+      do tidyUp
 
     super
 
